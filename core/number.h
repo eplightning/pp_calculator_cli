@@ -38,24 +38,31 @@ namespace Calculator {
         friend std::ostream &operator<<(std::ostream &stream, const Number &number);
 
     private:
+        // implementacja działań matem.
         void add(const Number &right, bool ignoreSign = false);
         void subtract(const Number &right, bool ignoreSign = false);
 
+        // porównywarka liczb
         int compareWith(const Number &other, bool ignoreSign = false) const;
 
+        // pomocnicze do wczytywania/zapisywania z/do string
         void fromString(const std::string &input);
         std::string toString() const;
 
+        // sprawdzanie czy zero
+        bool isNull() const;
+
+        // pomocnicze do utrzymywania liczb w sensownej postaci
         void normalize();
         void removeLeadingZeros();
         void removeTrailingZeros();
 
-        // cyfry, miejsce przecinka, -/+
+        // przesuwanie przecinka w lewo i prawo
+        void shift(int distance);
+
         std::vector<char> m_digits;
         unsigned int m_decimals;
         bool m_negative;
-
-        // precyzja i dokładność operacji
         unsigned int m_precision;
         unsigned int m_accuracy;
     };

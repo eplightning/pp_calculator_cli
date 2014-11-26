@@ -308,6 +308,11 @@ void Number::fromString(const std::string &input)
     m_precision = m_decimals > 9 ? m_decimals : 10;
 }
 
+bool Number::isNull() const
+{
+    return m_digits.size() == 1 && m_digits.front() == 0;
+}
+
 void Number::normalize()
 {
     // przypadek: ,555 -> 0,555, puste lub , -> 0
@@ -322,7 +327,7 @@ void Number::normalize()
     }
 
     // ujemne zero
-    if (m_negative && m_digits.size() == 1 && m_digits.front() == 0)
+    if (m_negative && isNull())
         m_negative = false;
 }
 
@@ -350,6 +355,32 @@ void Number::removeTrailingZeros()
 
     if (oldDecimals > 0) {
         m_digits.erase(m_digits.begin(), m_digits.begin() + (oldDecimals));
+    }
+}
+
+void Number::shift(int distance)
+{
+    // zera nie można
+    if (isNull() || !distance)
+        return;
+
+    // w prawo
+    if (distance > 0) {
+        int decimals = m_decimals - distance;
+
+        for(; decimals < 0; decimals++) {
+            m_digits.insert(m_digits.begin(), 0);
+        }
+
+        m_decimals = decimals;
+
+        removeLeadingZeros();
+    } else {
+        m_decimals += distance;
+
+        while (m_digits.size() <= m_decimals) {
+            m_digits.push_back(0);
+        }
     }
 }
 
