@@ -41,7 +41,7 @@ namespace Calculator {
         void add(const Number &right, bool ignoreSign = false);
         void subtract(const Number &right, bool ignoreSign = false);
 
-        int compareWith(const Number &other) const;
+        int compareWith(const Number &other, bool ignoreSign = false) const;
 
         void fromString(const std::string &input);
         std::string toString() const;

@@ -235,8 +235,12 @@ void Number::subtract(const Number &right, bool ignoreSign)
 
 }
 
-int Number::compareWith(const Number &other) const
+int Number::compareWith(const Number &other, bool ignoreSign) const
 {
+    // znaki
+    if (!ignoreSign && m_negative != other.m_negative)
+        return m_negative ? 1 : -1;
+
     // najpierw ilość cyfr części całkowitej
     int inta = m_digits.size() - m_decimals;
     int intb = other.m_digits.size() - other.m_decimals;
@@ -316,6 +320,10 @@ void Number::normalize()
     if (m_decimals > 0) {
         removeTrailingZeros();
     }
+
+    // ujemne zero
+    if (m_negative && m_digits.size() == 1 && m_digits.front() == 0)
+        m_negative = false;
 }
 
 void Number::removeLeadingZeros()
