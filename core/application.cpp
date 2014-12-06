@@ -14,10 +14,11 @@ Application::Application(bool verbose) :
 
 Number Application::calculate(const std::string &input, int precision) const {
     Number num = input;
-    Number num2 = -10;
+    Number num2 = 0.5;
 
+    Number result = num * num2;
 
-    return num - num2;
+    return result;
     // tokenizer
     // syntax check
     // parser

@@ -22,6 +22,9 @@ namespace Calculator {
         // ustawianie znaku
         Number &setSign(char sign);
 
+        // liczba odwrotna
+        Number inverse() const;
+
         // operatory działań
         Number &operator+=(const Number &right);
         Number operator+(const Number &right) const;

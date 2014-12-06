@@ -230,9 +230,6 @@ void Number::add(const Number &right, bool ignoreSign)
         m_decimals = m_precision;
     }
 
-    // zer na końcu nie chcemy (po przecinku)
-    removeTrailingZeros();
-
     // dokładność
     if (m_accuracy > 0) {
         // todo: sprawdzić czy nie ma ładniejszego sposobu (jakiś range iterator?)
@@ -242,6 +239,9 @@ void Number::add(const Number &right, bool ignoreSign)
             *lit = 0;
         }
     }
+
+    // zer na końcu nie chcemy (po przecinku)
+    removeTrailingZeros();
 }
 
 void Number::subtract(const Number &right, bool ignoreSign)
@@ -367,9 +367,6 @@ void Number::subtract(const Number &right, bool ignoreSign)
         m_decimals = m_precision;
     }
 
-    // czyścimy
-    normalize();
-
     // dokładność
     if (m_accuracy > 0) {
         // todo: sprawdzić czy nie ma ładniejszego sposobu (jakiś range iterator?)
@@ -379,9 +376,77 @@ void Number::subtract(const Number &right, bool ignoreSign)
             *li = 0;
         }
     }
+
+    // czyścimy
+    normalize();
 }
 
 void Number::multiply(const Number &right)
+{
+    Number out;
+    int shift = 0;
+
+    // każda cyfra mnożnika
+    for (auto rit = right.m_digits.cbegin(); rit != right.m_digits.cend(); rit++, shift++) {
+        if (*rit == 0)
+            continue;
+
+        int carry = 0;
+        Number partial;
+        partial.m_digits.clear();
+
+        // każda cyfra liczby mnożonej
+        for (auto lit = m_digits.begin(); lit != m_digits.end(); lit++) {
+            int result = ((*lit) * (*rit)) + carry;
+
+            if (result > 90)
+                throw Exception("Digit greater than 9");
+
+            partial.m_digits.push_back(result % 10);
+            carry = result / 10;
+        }
+
+        if (carry > 0)
+            partial.m_digits.push_back(carry);
+
+        partial.shift(shift);
+
+        out += partial;
+    }
+
+    // znak liczby
+    out.m_negative = (m_negative != right.m_negative);
+
+    // przecinek
+    out.m_decimals = m_decimals + right.m_decimals;
+
+    if (out.m_decimals > out.m_digits.size())
+        throw Exception("Multiplication: m_decimals > number size");
+
+    // kopiujemy wynik
+    *this = out;
+
+    // precyzja
+    if (m_decimals > m_precision) {
+        m_digits.erase(m_digits.begin(), m_digits.begin() + (m_decimals - m_precision));
+        m_decimals = m_precision;
+    }
+
+    // dokładność
+    if (m_accuracy > 0) {
+        // todo: sprawdzić czy nie ma ładniejszego sposobu (jakiś range iterator?)
+        int zeros = m_digits.size() - m_decimals - m_accuracy;
+
+        for (auto li = m_digits.begin() + m_decimals; zeros > 0; li++, zeros--) {
+            *li = 0;
+        }
+    }
+
+    // sprzątanie
+    normalize();
+}
+
+Number Number::inverse() const
 {
 
 }
