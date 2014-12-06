@@ -47,7 +47,7 @@ Number &Number::operator+=(const Number &right)
     return *this;
 }
 
-const Number Number::operator+(const Number &right) const
+Number Number::operator+(const Number &right) const
 {
     Number result = *this;
 
@@ -55,6 +55,39 @@ const Number Number::operator+(const Number &right) const
 
     return result;
 }
+
+Number &Number::operator-=(const Number &right)
+{
+    subtract(right);
+
+    return *this;
+}
+
+Number Number::operator-(const Number &right) const
+{
+    Number result = *this;
+
+    result -= right;
+
+    return result;
+}
+
+Number &Number::operator*=(const Number &right)
+{
+    multiply(right);
+
+    return *this;
+}
+
+Number Number::operator*(const Number &right) const
+{
+    Number result = *this;
+
+    result *= right;
+
+    return result;
+}
+
 
 bool Number::operator==(const Number &other) const
 {
@@ -226,12 +259,130 @@ void Number::subtract(const Number &right, bool ignoreSign)
         }
     }
 
-    // ujemna - ujemna -> -5 - -6 = -(5 - 6)
-    if (m_negative && right.m_negative)
-        m_negative = false;
+    int cmp = compareWith(right, true);
 
-    // dodatnia - dodatnia
-    // TODO
+    Number *bignum;
+    const Number *smallnum;
+
+    if (cmp == 0) {
+        // po prostu zero
+        m_digits.clear();
+        m_digits.push_back(0);
+        m_negative = false;
+        m_decimals = 0;
+        return;
+    } else if (cmp < 0) {
+        bignum = this;
+        smallnum = &right;
+    } else {
+        bignum = new Number(right);
+        smallnum = this;
+
+        bignum->m_negative = !m_negative; // 4 - 6  = -(6 - 4)
+    }
+
+    auto li = bignum->m_digits.begin();
+    auto ri = smallnum->m_digits.cbegin();
+
+    // paddingi jeśli liczba mniejsza ma więcej liczb po przecinku
+    int ninePadding = 0;
+    int tenPadding = 0;
+
+    // carry
+    bool carry = false;
+
+    if (bignum->m_decimals > smallnum->m_decimals) {
+        li += (bignum->m_decimals - smallnum->m_decimals);
+    } else if (bignum->m_decimals < smallnum->m_decimals) {
+        while (*li == 0) {
+            *li = 9;
+            li++;
+
+            if (li == bignum->m_digits.end())
+                throw Exception("Can't find digit greater than 0 ?!");
+        }
+
+        --(*li);
+
+        li = bignum->m_digits.begin();
+
+        bignum->m_decimals += smallnum->m_decimals - bignum->m_decimals;
+        ninePadding = smallnum->m_decimals - bignum->m_decimals - 1;
+        tenPadding = 1;
+    }
+
+    for (; ri != smallnum->m_digits.cend(); ri++, li++) {
+        if (li == bignum->m_digits.end())
+            throw Exception("Bigger number finished earlier than smaller");
+
+        if (tenPadding > 0) {
+            li = bignum->m_digits.insert(li, 10 - *ri);
+            tenPadding--;
+            continue;
+        }
+
+        if (ninePadding > 0) {
+            li = bignum->m_digits.insert(li, 9 - *ri);
+            // przesunąć iterator
+            ninePadding--;
+            continue;
+        }
+
+        int result = *li;
+
+        if (carry) {
+            --result;
+            carry = false;
+        }
+
+        result -= *ri;
+
+        if (result < 0) {
+            carry = true;
+            result += 10;
+
+            if (result < 0)
+                throw Exception("Digit smaller than 0");
+        }
+
+        *li = result;
+    }
+
+    if (carry) {
+        if (li == bignum->m_digits.end() || *li <= 0)
+            throw Exception("Cannot subtract last carry");
+
+        --(*li);
+    }
+
+    // jeśli robiliśmy na kopii to musimy teraz skopiować wynik i posprzątać
+    if (cmp > 0) {
+        *this = *bignum;
+        delete bignum;
+    }
+
+    // precyzja
+    if (m_decimals > m_precision) {
+        m_digits.erase(m_digits.begin(), m_digits.begin() + (m_decimals - m_precision));
+        m_decimals = m_precision;
+    }
+
+    // czyścimy
+    normalize();
+
+    // dokładność
+    if (m_accuracy > 0) {
+        // todo: sprawdzić czy nie ma ładniejszego sposobu (jakiś range iterator?)
+        int zeros = m_digits.size() - m_decimals - m_accuracy;
+
+        for (li = m_digits.begin() + m_decimals; zeros > 0; li++, zeros--) {
+            *li = 0;
+        }
+    }
+}
+
+void Number::multiply(const Number &right)
+{
 
 }
 

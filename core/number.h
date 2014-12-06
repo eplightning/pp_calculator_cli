@@ -24,7 +24,11 @@ namespace Calculator {
 
         // operatory działań
         Number &operator+=(const Number &right);
-        const Number operator+(const Number &right) const;
+        Number operator+(const Number &right) const;
+        Number &operator-=(const Number &right);
+        Number operator-(const Number &right) const;
+        Number &operator*=(const Number &right);
+        Number operator*(const Number &right) const;
 
         // operatory porównań
         bool operator==(const Number &other) const;
@@ -41,6 +45,7 @@ namespace Calculator {
         // implementacja działań matem.
         void add(const Number &right, bool ignoreSign = false);
         void subtract(const Number &right, bool ignoreSign = false);
+        void multiply(const Number &right);
 
         // porównywarka liczb
         int compareWith(const Number &other, bool ignoreSign = false) const;
