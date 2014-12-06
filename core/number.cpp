@@ -527,11 +527,13 @@ void Number::shift(int distance)
 
         removeLeadingZeros();
     } else {
-        m_decimals += distance;
+        m_decimals -= distance;
 
         while (m_digits.size() <= m_decimals) {
             m_digits.push_back(0);
         }
+
+        removeTrailingZeros();
     }
 }
 
