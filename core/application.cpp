@@ -14,9 +14,9 @@ Application::Application(bool verbose) :
 
 Number Application::calculate(const std::string &input, int precision) const {
     Number num = input;
-    Number num2 = 0.5;
+    Number num2 = 3;
 
-    Number result = num * num2;
+    Number result = num / num2;
 
     return result;
     // tokenizer

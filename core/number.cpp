@@ -1,6 +1,7 @@
 #include "number.h"
 #include "exception.h"
 
+#include <deque>
 #include <ostream>
 #include <string>
 #include <sstream>
@@ -84,6 +85,36 @@ Number Number::operator*(const Number &right) const
     Number result = *this;
 
     result *= right;
+
+    return result;
+}
+
+Number &Number::operator/=(const Number &right)
+{
+    // 0 / x = 0
+    if (isNull())
+        return *this;
+
+    // a / a = a
+    if (*this == right) {
+        m_digits.clear();
+        m_digits.push_back(1);
+        m_decimals = 0;
+        m_negative = (m_negative != right.m_negative);
+        return *this;
+    }
+
+    // a / b = a * (1/b)
+    multiply(right.inverse());
+
+    return *this;
+}
+
+Number Number::operator/(const Number &right) const
+{
+    Number result = *this;
+
+    result /= right;
 
     return result;
 }
@@ -357,6 +388,9 @@ void Number::subtract(const Number &right, bool ignoreSign)
 
     // jeśli robiliśmy na kopii to musimy teraz skopiować wynik i posprzątać
     if (cmp > 0) {
+        bignum->m_accuracy = m_accuracy;
+        bignum->m_precision = m_precision;
+
         *this = *bignum;
         delete bignum;
     }
@@ -424,6 +458,8 @@ void Number::multiply(const Number &right)
         throw Exception("Multiplication: m_decimals > number size");
 
     // kopiujemy wynik
+    out.m_accuracy = m_accuracy;
+    out.m_precision = m_precision;
     *this = out;
 
     // precyzja
@@ -448,7 +484,79 @@ void Number::multiply(const Number &right)
 
 Number Number::inverse() const
 {
+    // dzielenie przez 0
+    if (isNull())
+        throw Exception("Divison by 0 detected");
 
+    // wynikowa liczba
+    Number result;
+    result.m_digits.clear();
+    result.m_precision = m_precision;
+    result.m_accuracy = m_accuracy;
+    result.m_negative = m_negative;
+
+    // dzieląca liczba
+    Number integer = *this;
+
+    if (m_decimals > 0) {
+        integer.shift(m_decimals);
+    }
+
+    // szukanie odwrotności 0.(dowolna ilość zer)1, lub jedynki
+    if (integer.m_digits.size() == 1 && integer.m_digits.front() == 1) {
+        result.m_digits.push_back(1);
+        result.shift(m_decimals);
+        return result;
+    }
+
+    // tymczasowa
+    Number tmp(10);
+
+    // jako że wrzucamy odwrotnie ...
+    std::deque<char> numbers;
+
+    int digit = 0;
+
+    do {
+        int cmp = tmp.compareWith(integer, true);
+
+        if (cmp <= 0) {
+            ++digit;
+            tmp -= integer;
+        } else {
+            numbers.push_front(digit);
+            result.m_decimals++;
+            digit = 0;
+            tmp.shift(1);
+        }
+    } while(result.m_decimals <= m_precision && !tmp.isNull());
+
+    if (digit > 0) {
+        numbers.push_front(digit);
+        result.m_decimals++;
+    }
+
+    // teraz dodajemy do liczby
+    result.m_digits.insert(result.m_digits.begin(), numbers.begin(), numbers.end());
+    result.m_digits.push_back(0);
+
+    // 1 / 0,321 = 1000 * (1 / 321)
+    result.shift(m_decimals);
+
+    // dokładność
+    if (m_accuracy > 0) {
+        // todo: sprawdzić czy nie ma ładniejszego sposobu (jakiś range iterator?)
+        int zeros = result.m_digits.size() - result.m_decimals - m_accuracy;
+
+        for (auto li = result.m_digits.begin() + result.m_decimals; zeros > 0; li++, zeros--) {
+            *li = 0;
+        }
+    }
+
+    // sprzątanie
+    result.normalize();
+
+    return result;
 }
 
 int Number::compareWith(const Number &other, bool ignoreSign) const

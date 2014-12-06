@@ -32,6 +32,8 @@ namespace Calculator {
         Number operator-(const Number &right) const;
         Number &operator*=(const Number &right);
         Number operator*(const Number &right) const;
+        Number &operator/=(const Number &right);
+        Number operator/(const Number &right) const;
 
         // operatory porównań
         bool operator==(const Number &other) const;
