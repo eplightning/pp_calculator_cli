@@ -1,5 +1,7 @@
 #include "application.h"
 #include "number.h"
+#include "tokenizer/token.h"
+#include "tokenizer/tokenizer.h"
 
 #include <exception>
 #include <iostream>
@@ -13,12 +15,41 @@ Application::Application(bool verbose) :
 }
 
 Number Application::calculate(const std::string &input, int precision) const {
-    Number num = input;
+    Tokenizer tok(input);
+
+    std::vector<Token*> tokens = tok.tokenize();
+
+    for (Token *x : tokens) {
+        switch (x->type()) {
+            case TokenType::bracketEnd:
+                std::cout << "BracketEnd " << ((BracketToken*) x)->bracket();
+                break;
+
+            case TokenType::bracketOpen:
+                std::cout << "BracketOpen " << ((BracketToken*) x)->bracket();
+                break;
+
+            case TokenType::num:
+                std::cout << "Num " << *(((NumberToken*) x)->num());
+                break;
+
+            case TokenType::op:
+                OperatorToken *y = (OperatorToken*) x;
+                std::cout << "Op " << y->op() << " (" << y->precision() << " " << y->accuracy() << ")";
+                break;
+        }
+
+        std::cout << std::endl;
+    }
+
+    return 0;
+
+    /*Number num = input;
     Number num2 = 3;
 
     Number result = num / num2;
 
-    return result;
+    return result;*/
     // tokenizer
     // syntax check
     // parser

@@ -2,12 +2,22 @@
 #include "exception.h"
 
 #include <deque>
+#include <limits>
 #include <ostream>
 #include <string>
 #include <sstream>
 #include <vector>
 
-namespace Calculator {
+using namespace Calculator;
+
+std::ostream &Calculator::operator<<(std::ostream &stream, const Number &number)
+{
+    std::string out = number.toString();
+
+    stream << out;
+
+    return stream;
+}
 
 Number::Number() :
     m_digits(1, 0), m_decimals(0), m_negative(false), m_precision(10), m_accuracy(0)
@@ -150,15 +160,6 @@ bool Number::operator<=(const Number &other) const
     return compareWith(other) != -1;
 }
 
-std::ostream &operator<<(std::ostream &stream, const Number &number)
-{
-    std::string out = number.toString();
-
-    stream << out;
-
-    return stream;
-}
-
 Number &Number::setAccuracy(int accuracy)
 {
     m_accuracy = accuracy;
@@ -171,10 +172,38 @@ Number &Number::setPrecision(int precision)
     return *this;
 }
 
+bool Number::isNegative() const
+{
+    return m_negative;
+}
+
 Number &Number::setSign(char sign)
 {
     m_negative = (sign == '-');
     return *this;
+}
+
+unsigned long long Number::asInteger(bool integers) const
+{
+    auto start = integers ? m_digits.cbegin() + m_decimals : m_digits.cbegin();
+    auto end   = integers ? m_digits.cend() : m_digits.cbegin() + m_decimals;
+
+    // liczymy ile cyfr max
+    unsigned long long max = std::numeric_limits<unsigned long long>::max();
+    int digits = 0;
+
+    while (max >= 10) {
+        max /= 10;
+        digits++;
+    }
+
+    unsigned long long out = 0;
+
+    for (int base = 1; base < digits && start != end; base *= 10, start++) {
+        out += base * (*start);
+    }
+
+    return out;
 }
 
 void Number::add(const Number &right, bool ignoreSign)
@@ -728,5 +757,3 @@ std::string Number::toString() const
 
     return stream;
 }
-
-} // namespace Calculator

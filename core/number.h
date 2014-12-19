@@ -19,11 +19,15 @@ namespace Calculator {
         Number &setAccuracy(int accuracy);
         Number &setPrecision(int precision);
 
-        // ustawianie znaku
+        // ustawianie/pobieranie znaku
+        bool isNegative() const;
         Number &setSign(char sign);
 
         // liczba odwrotna
         Number inverse() const;
+
+        // zwraca (a przynajmniej stara się zwrócić) część całkowitą lub po przecinku jako int
+        unsigned long long asInteger(bool integers = true) const;
 
         // operatory działań
         Number &operator+=(const Number &right);
@@ -77,7 +81,7 @@ namespace Calculator {
         unsigned int m_accuracy;
     };
 
-    std::ostream &operator<<(std::ostream &stream, const Number &number);
+    std::ostream &operator<<(std::ostream &stream, const Calculator::Number &number);
 }
 
 #endif // NUMBER_H
