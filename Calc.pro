@@ -17,4 +17,5 @@ HEADERS += \
     core/exception.h \
     core/number.h \
     tokenizer/token.h \
-    tokenizer/tokenizer.h
+    tokenizer/tokenizer.h \
+    parser/expression.h

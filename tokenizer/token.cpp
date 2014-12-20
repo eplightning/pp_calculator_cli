@@ -93,69 +93,11 @@ TokenType OperatorToken::type() const
 // Operator Token (with precision/accuracy)
 //
 
-OperatorPrecisionToken::OperatorPrecisionToken(char op, const std::string &precision)
+OperatorPrecisionToken::OperatorPrecisionToken(char op, const Number &precision)
     : OperatorToken(op)
 {
-    // niestety klasa od liczb sprowadza zapisy typu 0.1000 na 0.1 więc nie możemy tego użyć do określania precyzji ... :/
-    // liczymy ile max. cyfr nas interesuje
-    unsigned int max = std::numeric_limits<unsigned int>::max();
-    int digits = 0;
-
-    while (max >= 10) {
-        max /= 10;
-        digits++;
-    }
-
-    int base = 1;
-    int currentDigits = 0;
-    unsigned int current = 0;
-
-    // precyzja (lub dokładność)
-    auto it = precision.crbegin();
-
-    for (; it != precision.crend() && *it != '.' && *it != ','; it++) {
-        if (*it == '-' || *it == '+')
-            continue;
-
-        if (*it < '0' || *it > '9')
-            throw Exception("Tokenizer: Unknown character found while reading precision/accuracy");
-
-        if (currentDigits < digits) {
-            current += base * ((*it) - '0');
-            base *= 10;
-            currentDigits++;
-        }
-    }
-
-    if (it == precision.crend()) {
-        m_accuracy = current;
-        m_precision = 0;
-
-        return;
-    }
-
-    m_precision = current;
-
-    current = 0;
-    currentDigits = 0;
-    base = 1;
-
-    // dokładność
-    for (it++; it != precision.crend(); it++) {
-        if (*it == '-' || *it == '+')
-            continue;
-
-        if (*it < '0' || *it > '9')
-            throw Exception("Tokenizer: Unknown character found while reading accuracy");
-
-        if (currentDigits < digits) {
-            current += base * ((*it) - '0');
-            base *= 10;
-            currentDigits++;
-        }
-    }
-
-    m_accuracy = current;
+    m_precision = precision.asInteger(false);
+    m_accuracy  = precision.asInteger(true);
 }
 
 unsigned int OperatorPrecisionToken::accuracy() const
@@ -172,18 +114,13 @@ unsigned int OperatorPrecisionToken::precision() const
 // Number Token
 //
 
-NumberToken::NumberToken(Number *num)
+NumberToken::NumberToken(const std::string &num)
     : m_num(num)
 {
 
 }
 
-NumberToken::~NumberToken()
-{
-    delete m_num;
-}
-
-Number *NumberToken::num() const
+const Number &NumberToken::num() const
 {
     return m_num;
 }

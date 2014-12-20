@@ -30,7 +30,7 @@ Number Application::calculate(const std::string &input, int precision) const {
                 break;
 
             case TokenType::num:
-                std::cout << "Num " << *(((NumberToken*) x)->num());
+                std::cout << "Num " << (((NumberToken*) x)->num());
                 break;
 
             case TokenType::op:

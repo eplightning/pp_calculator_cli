@@ -20,7 +20,7 @@ std::ostream &Calculator::operator<<(std::ostream &stream, const Number &number)
 }
 
 Number::Number() :
-    m_digits(1, 0), m_decimals(0), m_negative(false), m_precision(10), m_accuracy(0)
+    m_digits(1, 0), m_decimals(0), m_negative(false), m_precision(10), m_accuracy(0), m_trailingZeros(0)
 {
 
 }
@@ -199,7 +199,20 @@ unsigned long long Number::asInteger(bool integers) const
 
     unsigned long long out = 0;
 
-    for (int base = 1; base < digits && start != end; base *= 10, start++) {
+    int base = 1;
+
+    if (!integers) {
+        for (int i = 0; digits > 0 && i < m_trailingZeros; i++) {
+            base *= 10;
+            digits--;
+        }
+
+        if (digits == 0) {
+            return base / 10;
+        }
+    }
+
+    for (; digits > 0 && start != end; --digits, base *= 10, ++start) {
         out += base * (*start);
     }
 
@@ -656,7 +669,7 @@ void Number::fromString(const std::string &input)
         ++numbersAdded;
     }
 
-    normalize();
+    m_trailingZeros = normalize();
 
     m_precision = m_decimals > 9 ? m_decimals : 10;
 }
@@ -666,7 +679,7 @@ bool Number::isNull() const
     return m_digits.size() == 1 && m_digits.front() == 0;
 }
 
-void Number::normalize()
+int Number::normalize()
 {
     // przypadek: ,555 -> 0,555, puste lub , -> 0
     if (m_digits.empty() || m_digits.size() == m_decimals) {
@@ -675,13 +688,17 @@ void Number::normalize()
         removeLeadingZeros();
     }
 
+    int trailing = 0;
+
     if (m_decimals > 0) {
-        removeTrailingZeros();
+        trailing = removeTrailingZeros();
     }
 
     // ujemne zero
     if (m_negative && isNull())
         m_negative = false;
+
+    return trailing;
 }
 
 void Number::removeLeadingZeros()
@@ -695,7 +712,7 @@ void Number::removeLeadingZeros()
     }
 }
 
-void Number::removeTrailingZeros()
+int Number::removeTrailingZeros()
 {
     int oldDecimals = m_decimals;
 
@@ -709,6 +726,8 @@ void Number::removeTrailingZeros()
     if (oldDecimals > 0) {
         m_digits.erase(m_digits.begin(), m_digits.begin() + (oldDecimals));
     }
+
+    return oldDecimals;
 }
 
 void Number::shift(int distance)

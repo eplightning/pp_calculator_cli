@@ -67,9 +67,9 @@ namespace Calculator {
         bool isNull() const;
 
         // pomocnicze do utrzymywania liczb w sensownej postaci
-        void normalize();
+        int normalize();
         void removeLeadingZeros();
-        void removeTrailingZeros();
+        int removeTrailingZeros();
 
         // przesuwanie przecinka w lewo i prawo
         void shift(int distance);
@@ -79,6 +79,7 @@ namespace Calculator {
         bool m_negative;
         unsigned int m_precision;
         unsigned int m_accuracy;
+        int m_trailingZeros;
     };
 
     std::ostream &operator<<(std::ostream &stream, const Calculator::Number &number);

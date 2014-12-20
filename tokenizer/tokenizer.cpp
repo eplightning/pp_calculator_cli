@@ -182,7 +182,7 @@ void Tokenizer::terminalRead(std::vector<Token*> &list)
             list.push_back(tok);
         }
     } else if (m_state_numDigitRead) {
-        tok = new NumberToken(new Number(std::string(m_it2, m_it)));
+        tok = new NumberToken(std::string(m_it2, m_it));
         list.push_back(tok);
     }
 

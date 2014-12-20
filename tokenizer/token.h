@@ -46,10 +46,11 @@ namespace Calculator {
 
     class OperatorPrecisionToken : public OperatorToken {
     public:
-        OperatorPrecisionToken(char op, const std::string &precision);
+        OperatorPrecisionToken(char op, const Number &precision);
 
         unsigned int accuracy() const;
         unsigned int precision() const;
+
     private:
         unsigned int m_accuracy;
         unsigned int m_precision;
@@ -57,15 +58,14 @@ namespace Calculator {
 
     class NumberToken : public Token {
     public:
-        NumberToken(Number *num);
-        ~NumberToken();
+        NumberToken(const std::string &num);
 
-        Number *num() const;
+        const Number &num() const;
 
         TokenType type() const;
 
     private:
-        Number *m_num;
+        Number m_num;
     };
 
 }
