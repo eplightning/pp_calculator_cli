@@ -35,8 +35,8 @@ namespace Calculator {
         OperatorToken(char op);
 
         char op() const;
-        virtual unsigned int accuracy() const;
-        virtual unsigned int precision() const;
+        virtual int accuracy() const;
+        virtual int precision() const;
 
         TokenType type() const;
 
@@ -48,12 +48,12 @@ namespace Calculator {
     public:
         OperatorPrecisionToken(char op, const Number &precision);
 
-        unsigned int accuracy() const;
-        unsigned int precision() const;
+        int accuracy() const;
+        int precision() const;
 
     private:
-        unsigned int m_accuracy;
-        unsigned int m_precision;
+        int m_accuracy;
+        int m_precision;
     };
 
     class NumberToken : public Token {

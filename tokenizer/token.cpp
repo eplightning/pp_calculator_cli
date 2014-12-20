@@ -74,14 +74,14 @@ char OperatorToken::op() const
     return m_op;
 }
 
-unsigned int OperatorToken::accuracy() const
+int OperatorToken::accuracy() const
 {
-    return 0;
+    return -1;
 }
 
-unsigned int OperatorToken::precision() const
+int OperatorToken::precision() const
 {
-    return 0;
+    return -1;
 }
 
 TokenType OperatorToken::type() const
@@ -98,14 +98,17 @@ OperatorPrecisionToken::OperatorPrecisionToken(char op, const Number &precision)
 {
     m_precision = precision.asInteger(false);
     m_accuracy  = precision.asInteger(true);
+
+    if (m_precision == 0)
+        m_precision = -1;
 }
 
-unsigned int OperatorPrecisionToken::accuracy() const
+int OperatorPrecisionToken::accuracy() const
 {
     return m_accuracy;
 }
 
-unsigned int OperatorPrecisionToken::precision() const
+int OperatorPrecisionToken::precision() const
 {
     return m_precision;
 }

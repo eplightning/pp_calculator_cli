@@ -185,6 +185,9 @@ Number &Number::setSign(char sign)
 
 unsigned long long Number::asInteger(bool integers) const
 {
+    if (!integers && m_decimals == 0)
+        return 0;
+
     auto start = integers ? m_digits.cbegin() + m_decimals : m_digits.cbegin();
     auto end   = integers ? m_digits.cend() : m_digits.cbegin() + m_decimals;
 
@@ -496,7 +499,7 @@ void Number::multiply(const Number &right)
     // przecinek
     out.m_decimals = m_decimals + right.m_decimals;
 
-    if (out.m_decimals > out.m_digits.size())
+    if (out.m_digits.size() < static_cast<size_t>(out.m_decimals))
         throw Exception("Multiplication: m_decimals > number size");
 
     // kopiujemy wynik
@@ -682,7 +685,7 @@ bool Number::isNull() const
 int Number::normalize()
 {
     // przypadek: ,555 -> 0,555, puste lub , -> 0
-    if (m_digits.empty() || m_digits.size() == m_decimals) {
+    if (m_digits.empty() || m_digits.size() == static_cast<size_t>(m_decimals)) {
         m_digits.push_back(0);
     } else {
         removeLeadingZeros();
@@ -750,7 +753,7 @@ void Number::shift(int distance)
     } else {
         m_decimals -= distance;
 
-        while (m_digits.size() <= m_decimals) {
+        while (m_digits.size() <= static_cast<size_t>(m_decimals)) {
             m_digits.push_back(0);
         }
 

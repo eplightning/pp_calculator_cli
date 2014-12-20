@@ -75,10 +75,10 @@ namespace Calculator {
         void shift(int distance);
 
         std::vector<char> m_digits;
-        unsigned int m_decimals;
+        int m_decimals;
         bool m_negative;
-        unsigned int m_precision;
-        unsigned int m_accuracy;
+        int m_precision;
+        int m_accuracy;
         int m_trailingZeros;
     };
 
