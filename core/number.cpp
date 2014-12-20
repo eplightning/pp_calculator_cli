@@ -168,7 +168,7 @@ Number &Number::setAccuracy(int accuracy)
 
 Number &Number::setPrecision(int precision)
 {
-    m_precision = precision;
+    m_precision = precision >= 0 ? precision : 10;
     return *this;
 }
 
@@ -181,6 +181,76 @@ Number &Number::setSign(char sign)
 {
     m_negative = (sign == '-');
     return *this;
+}
+
+Number Number::operator[](int index) const
+{
+    if (index > 0) {
+        index = index + m_decimals - 1;
+    } else if (index < 0) {
+        index = m_decimals + index;
+    } else {
+        throw Exception("Number[0] operation is undefined (numbers are indexed 1..n)");
+    }
+
+    if (index < 0 || m_digits.size() <= static_cast<size_t>(index))
+        throw Exception("Number[index] out of bounds");
+
+    Number out;
+
+    out.m_accuracy = m_accuracy;
+    out.m_precision = m_precision;
+    out.m_digits.clear();
+    out.m_digits.push_back(m_digits[index]);
+
+    return out;
+}
+
+Number Number::operator[](const Range &range) const
+{
+    int left = range.left();
+    int right = range.right();
+
+    if (left == 0 || right == 0)
+        throw Exception("Number[0] operation is undefined (numbers are indexed 1..n)");
+
+    if (left < right)
+        throw Exception("Number[x..y] operation where x < y is undefined");
+
+    int lefti;
+    int righti;
+
+    if (left > 0) {
+        lefti = left + m_decimals - 1;
+    } else {
+        lefti = m_decimals + left;
+    }
+
+    if (right > 0) {
+        righti = right + m_decimals - 1;
+    } else {
+        righti = m_decimals + right;
+    }
+
+    if ((lefti < 0 || righti < 0) ||
+        (m_digits.size() <= static_cast<size_t>(lefti) || m_digits.size() <= static_cast<size_t>(righti)))
+        throw Exception("Number[x..y] out of bounds");
+
+    Number out;
+
+    out.m_accuracy = m_accuracy;
+    out.m_precision = m_precision;
+    out.m_digits.clear();
+
+    out.m_digits.insert(out.m_digits.begin(), m_digits.cbegin() + righti, m_digits.cbegin() + lefti + 1);
+
+    if (left > 0 && right < 0) {
+        out.m_decimals = right * (-1);
+    }
+
+    out.m_trailingZeros = out.normalize();
+
+    return out;
 }
 
 unsigned long long Number::asInteger(bool integers) const

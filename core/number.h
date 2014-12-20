@@ -1,6 +1,8 @@
 #ifndef NUMBER_H
 #define NUMBER_H
 
+#include "range.h"
+
 #include <ostream>
 #include <string>
 #include <vector>
@@ -28,6 +30,10 @@ namespace Calculator {
 
         // zwraca (a przynajmniej stara się zwrócić) część całkowitą lub po przecinku jako int
         unsigned long long asInteger(bool integers = true) const;
+
+        // operatory indexów
+        Number operator[](int index) const;
+        Number operator[](const Range &range) const;
 
         // operatory działań
         Number &operator+=(const Number &right);

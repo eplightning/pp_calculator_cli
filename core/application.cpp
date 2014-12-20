@@ -1,5 +1,6 @@
 #include "application.h"
 #include "number.h"
+#include "range.h"
 #include "tokenizer/token.h"
 #include "tokenizer/tokenizer.h"
 
@@ -15,7 +16,11 @@ Application::Application(bool verbose) :
 }
 
 Number Application::calculate(const std::string &input, int precision) const {
-    Tokenizer tok(input);
+    Number test = std::string("543210.60789");
+
+    return test[Range(2, -2)];
+
+    /*Tokenizer tok(input);
 
     std::vector<Token*> tokens = tok.tokenize();
 
@@ -42,7 +47,7 @@ Number Application::calculate(const std::string &input, int precision) const {
         std::cout << std::endl;
     }
 
-    return 0;
+    return 0;*/
 
     /*Number num = input;
     Number num2 = 3;

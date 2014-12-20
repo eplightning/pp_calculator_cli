@@ -11,7 +11,7 @@ namespace Calculator {
     public:
         virtual ~Expression();
 
-        virtual Number evaluate() = 0;
+        virtual Number evaluate(int accuracy = 0, int precision = 10) = 0;
         virtual ExpressionType type() const = 0;
     };
 
@@ -19,7 +19,7 @@ namespace Calculator {
     public:
         NumberExpression(const Number &num);
 
-        Number evaluate();
+        Number evaluate(int accuracy = 0, int precision = 10);
         ExpressionType type() const;
 
     private:
@@ -28,72 +28,72 @@ namespace Calculator {
 
     class RangeExpression : public Expression {
     public:
-        RangeExpression(Expression &left, Expression &right);
+        RangeExpression(Expression *left, Expression *right);
 
-        Number evaluate();
+        Number evaluate(int accuracy = 0, int precision = 10);
         ExpressionType type() const;
 
         Number left();
         Number right();
 
     private:
-        Expression &m_left;
-        Expression &m_right;
+        Expression *m_left;
+        Expression *m_right;
     };
 
     class OperatorExpression : public Expression {
     public:
-        OperatorExpression(Expression &left, Expression &right, int accuracy = -1, int precision = -1);
+        OperatorExpression(Expression *left, Expression *right, int accuracy = -1, int precision = -1);
 
         ExpressionType type() const;
 
     protected:
-        Expression &m_left;
-        Expression &m_right;
+        Expression *m_left;
+        Expression *m_right;
         int m_accuracy;
         int m_precision;
     };
 
     class AdditionExpression : public OperatorExpression {
     public:
-        AdditionExpression(Expression &left, Expression &right, int accuracy = -1, int precision = -1);
+        AdditionExpression(Expression *left, Expression *right, int accuracy = -1, int precision = -1);
 
-        Number evaluate();
+        Number evaluate(int accuracy = 0, int precision = 10);
     };
 
     class SubtractionExpression : public OperatorExpression {
     public:
-        SubtractionExpression(Expression &left, Expression &right, int accuracy = -1, int precision = -1);
+        SubtractionExpression(Expression *left, Expression *right, int accuracy = -1, int precision = -1);
 
-        Number evaluate();
+        Number evaluate(int accuracy = 0, int precision = 10);
     };
 
     class MultiplicationExpression : public OperatorExpression {
     public:
-        MultiplicationExpression(Expression &left, Expression &right, int accuracy = -1, int precision = -1);
+        MultiplicationExpression(Expression *left, Expression *right, int accuracy = -1, int precision = -1);
 
-        Number evaluate();
+        Number evaluate(int accuracy = 0, int precision = 10);
     };
 
     class DivisionExpression : public OperatorExpression {
     public:
-        DivisionExpression(Expression &left, Expression &right, int accuracy = -1, int precision = -1);
+        DivisionExpression(Expression *left, Expression *right, int accuracy = -1, int precision = -1);
 
-        Number evaluate();
+        Number evaluate(int accuracy = 0, int precision = 10);
     };
 
     class PrecisionExpression : public OperatorExpression {
     public:
-        PrecisionExpression(Expression &left, Expression &right, int accuracy = -1, int precision = -1);
+        PrecisionExpression(Expression *left, Expression *right, int accuracy = -1, int precision = -1);
 
-        Number evaluate();
+        Number evaluate(int accuracy = 0, int precision = 10);
     };
 
     class IndexExpression : public OperatorExpression {
     public:
-        IndexExpression(Expression &left, Expression &right, int accuracy = -1, int precision = -1);
+        IndexExpression(Expression *left, Expression *right, int accuracy = -1, int precision = -1);
 
-        Number evaluate();
+        Number evaluate(int accuracy = 0, int precision = 10);
     };
 
 }

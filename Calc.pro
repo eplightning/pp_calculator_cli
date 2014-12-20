@@ -10,7 +10,8 @@ SOURCES += \
     core/exception.cpp \
     core/number.cpp \
     tokenizer/tokenizer.cpp \
-    tokenizer/token.cpp
+    tokenizer/token.cpp \
+    parser/expression.cpp
 
 HEADERS += \
     core/application.h \
@@ -18,4 +19,5 @@ HEADERS += \
     core/number.h \
     tokenizer/token.h \
     tokenizer/tokenizer.h \
-    parser/expression.h
+    parser/expression.h \
+    core/range.h
