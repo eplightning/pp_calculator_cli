@@ -193,15 +193,15 @@ Number Number::operator[](int index) const
         throw Exception("Number[0] operation is undefined (numbers are indexed 1..n)");
     }
 
-    if (index < 0 || m_digits.size() <= static_cast<size_t>(index))
-        throw Exception("Number[index] out of bounds");
-
     Number out;
 
     out.m_accuracy = m_accuracy;
     out.m_precision = m_precision;
-    out.m_digits.clear();
-    out.m_digits.push_back(m_digits[index]);
+
+    if (index >= 0 && m_digits.size() > static_cast<size_t>(index)) {
+        out.m_digits.clear();
+        out.m_digits.push_back(m_digits[index]);
+    }
 
     return out;
 }

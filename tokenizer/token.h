@@ -16,20 +16,6 @@ namespace Calculator {
         virtual TokenType type() const = 0;
     };
 
-    class BracketToken : public Token {
-    public:
-        BracketToken(char bracket);
-
-        char bracket() const;
-
-        bool matching(const BracketToken &other) const;
-
-        TokenType type() const;
-
-    private:
-        char m_bracket;
-    };
-
     class OperatorToken : public Token {
     public:
         OperatorToken(char op);
@@ -42,6 +28,20 @@ namespace Calculator {
 
     private:
         char m_op;
+    };
+
+    class BracketToken : public OperatorToken {
+    public:
+        BracketToken(char bracket);
+
+        char bracket() const;
+
+        bool matching(const BracketToken &other) const;
+
+        TokenType type() const;
+
+    private:
+        char m_bracket;
     };
 
     class OperatorPrecisionToken : public OperatorToken {

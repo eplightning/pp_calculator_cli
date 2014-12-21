@@ -21,7 +21,7 @@ Token::~Token()
 //
 
 BracketToken::BracketToken(char bracket)
-    : m_bracket(bracket)
+    : OperatorToken(bracket), m_bracket(bracket)
 {
 
 }

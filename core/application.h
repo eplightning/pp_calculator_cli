@@ -3,6 +3,7 @@
 
 #include "number.h"
 
+#include <map>
 #include <string>
 
 namespace Calculator {
@@ -11,11 +12,12 @@ namespace Calculator {
     public:
         Application(bool verbose = true);
 
-        int execute() const;
+        int execute();
 
     private:
-        Number calculate(const std::string &input, int precision = 10) const;
+        Number calculate(const std::string &input, int precision = 10);
 
+        std::map<char, int> m_precedence;
         bool m_verbose;
     };
 

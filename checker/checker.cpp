@@ -21,7 +21,10 @@ void SyntaxChecker::check()
     for (auto it = m_tokens.cbegin(); it != m_tokens.cend(); it++) {
         // sprawdzanie nawiasów
         if ((*it)->type() == TokenType::bracketEnd) {
-            if (m_brackets.empty() || !m_brackets.back()->matching(*static_cast<BracketToken*>(*it)))
+            if (m_brackets.empty())
+                throw Exception("Syntax checker: Bracket end for not existent bracket open");
+
+            if (!m_brackets.back()->matching(*static_cast<BracketToken*>(*it)))
                 throw Exception("Syntax checker: Mismatching bracket end");
 
             m_brackets.pop_back();

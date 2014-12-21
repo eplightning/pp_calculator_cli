@@ -12,7 +12,8 @@ SOURCES += \
     tokenizer/tokenizer.cpp \
     tokenizer/token.cpp \
     parser/expression.cpp \
-    checker/checker.cpp
+    checker/checker.cpp \
+    parser/parser.cpp
 
 HEADERS += \
     core/application.h \
@@ -22,4 +23,5 @@ HEADERS += \
     tokenizer/tokenizer.h \
     parser/expression.h \
     core/range.h \
-    checker/checker.h
+    checker/checker.h \
+    parser/parser.h

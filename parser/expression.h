@@ -5,7 +5,7 @@
 
 namespace Calculator {
 
-    enum ExpressionType { num, op, range };
+    enum ExpressionType { exprNumber, exprOperator, exprRange };
 
     class Expression {
     public:

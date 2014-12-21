@@ -36,7 +36,7 @@ Number NumberExpression::evaluate(int accuracy, int precision)
 
 ExpressionType NumberExpression::type() const
 {
-    return ExpressionType::num;
+    return ExpressionType::exprNumber;
 }
 
 //
@@ -64,7 +64,7 @@ Number RangeExpression::evaluate(int, int)
 
 ExpressionType RangeExpression::type() const
 {
-    return ExpressionType::range;
+    return ExpressionType::exprRange;
 }
 
 Number RangeExpression::left()
@@ -95,7 +95,7 @@ OperatorExpression::~OperatorExpression()
 
 ExpressionType OperatorExpression::type() const
 {
-    return ExpressionType::op;
+    return ExpressionType::exprOperator;
 }
 
 //
@@ -234,7 +234,7 @@ Number IndexExpression::evaluate(int accuracy, int precision)
 {
     Number left = m_left->evaluate(accuracy, precision);
 
-    if (m_right->type() == ExpressionType::range) {
+    if (m_right->type() == ExpressionType::exprRange) {
         RangeExpression *rangeExpr = static_cast<RangeExpression*>(m_right);
 
         Number leftRange = rangeExpr->left();

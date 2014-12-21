@@ -2,12 +2,15 @@
 #include "number.h"
 #include "range.h"
 #include "checker/checker.h"
+#include "parser/expression.h"
+#include "parser/parser.h"
 #include "tokenizer/token.h"
 #include "tokenizer/tokenizer.h"
 
 #include <exception>
 #include <iostream>
 #include <string>
+#include <map>
 
 using namespace Calculator;
 
@@ -16,7 +19,7 @@ Application::Application(bool verbose) :
 {
 }
 
-Number Application::calculate(const std::string &input, int precision) const
+Number Application::calculate(const std::string &input, int precision)
 {
     // tokenizujemy
     Tokenizer tok(input);
@@ -49,18 +52,34 @@ Number Application::calculate(const std::string &input, int precision) const
         std::cout << std::endl;
     }*/
 
+    // parser
+    Parser parser(tokens, m_precedence, precision);
+    Expression *expr = parser.parse();
 
+    Number out = expr->evaluate(0, precision);
+
+    // usuwanie wyrażeń
+    delete expr;
 
     // usuwanie tokenów
     for (Token *tok : tokens) {
         delete tok;
     }
 
-    return 0;
+    return out;
 }
 
-int Application::execute() const
+int Application::execute()
 {
+    // pierwszeństwo operatorów
+    m_precedence['.'] = 4;
+    m_precedence['+'] = 3;
+    m_precedence['-'] = 3;
+    m_precedence[':'] = 2;
+    m_precedence['/'] = 1;
+    m_precedence['*'] = 1;
+    m_precedence['['] = 0;
+
     std::string input;
 
     if (m_verbose)
