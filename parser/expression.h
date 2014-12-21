@@ -29,6 +29,7 @@ namespace Calculator {
     class RangeExpression : public Expression {
     public:
         RangeExpression(Expression *left, Expression *right);
+        ~RangeExpression();
 
         Number evaluate(int accuracy = 0, int precision = 10);
         ExpressionType type() const;
@@ -44,6 +45,7 @@ namespace Calculator {
     class OperatorExpression : public Expression {
     public:
         OperatorExpression(Expression *left, Expression *right, int accuracy = -1, int precision = -1);
+        ~OperatorExpression();
 
         ExpressionType type() const;
 

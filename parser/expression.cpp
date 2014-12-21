@@ -49,6 +49,12 @@ RangeExpression::RangeExpression(Expression *left, Expression *right) :
 
 }
 
+RangeExpression::~RangeExpression()
+{
+    delete m_left;
+    delete m_right;
+}
+
 Number RangeExpression::evaluate(int, int)
 {
     throw Exception("Parser: Range cannot be evaluated (can only be used as index)");
@@ -79,6 +85,12 @@ OperatorExpression::OperatorExpression(Expression *left, Expression *right, int 
     m_left(left), m_right(right), m_accuracy(accuracy), m_precision(precision)
 {
 
+}
+
+OperatorExpression::~OperatorExpression()
+{
+    delete m_left;
+    delete m_right;
 }
 
 ExpressionType OperatorExpression::type() const

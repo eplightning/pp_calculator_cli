@@ -1,6 +1,7 @@
 #include "application.h"
 #include "number.h"
 #include "range.h"
+#include "checker/checker.h"
 #include "tokenizer/token.h"
 #include "tokenizer/tokenizer.h"
 
@@ -15,16 +16,17 @@ Application::Application(bool verbose) :
 {
 }
 
-Number Application::calculate(const std::string &input, int precision) const {
-    Number test = std::string("543210.60789");
-
-    return test[Range(2, -2)];
-
-    /*Tokenizer tok(input);
-
+Number Application::calculate(const std::string &input, int precision) const
+{
+    // tokenizujemy
+    Tokenizer tok(input);
     std::vector<Token*> tokens = tok.tokenize();
 
-    for (Token *x : tokens) {
+    // sprawdzamy sens
+    SyntaxChecker checker(tokens);
+    checker.check();
+
+    /*for (Token *x : tokens) {
         switch (x->type()) {
             case TokenType::bracketEnd:
                 std::cout << "BracketEnd " << ((BracketToken*) x)->bracket();
@@ -45,19 +47,16 @@ Number Application::calculate(const std::string &input, int precision) const {
         }
 
         std::cout << std::endl;
+    }*/
+
+
+
+    // usuwanie tokenów
+    for (Token *tok : tokens) {
+        delete tok;
     }
 
-    return 0;*/
-
-    /*Number num = input;
-    Number num2 = 3;
-
-    Number result = num / num2;
-
-    return result;*/
-    // tokenizer
-    // syntax check
-    // parser
+    return 0;
 }
 
 int Application::execute() const
