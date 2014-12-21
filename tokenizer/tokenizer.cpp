@@ -23,116 +23,124 @@ std::vector<Token*> Tokenizer::tokenize()
 
     std::vector<Token*> list;
 
-    while (m_it != m_input.cend()) {
-        // jeśli znak, i to jest odpowiednie miejsce dla znaku (za niczym, za operatorem albo za otwarciem nawiasa)
-        if (isSign() && (!m_last || (m_last->type() == TokenType::op || m_state_operator) || m_last->type() == TokenType::bracketOpen)) {
-            // koniec liczby odkryty, kończymy token i pętla od tego samego miejsca
-            if (m_state_numDigitRead) {
-                terminalRead(list);
-                resetState();
-                continue;
-            }
+    try {
+        while (m_it != m_input.cend()) {
+            // jeśli znak, i to jest odpowiednie miejsce dla znaku (za niczym, za operatorem albo za otwarciem nawiasa)
+            if (isSign() && (!m_last || (m_last->type() == TokenType::op || m_state_operator) || m_last->type() == TokenType::bracketOpen)) {
+                // koniec liczby odkryty, kończymy token i pętla od tego samego miejsca
+                if (m_state_numDigitRead) {
+                    terminalRead(list);
+                    resetState();
+                    continue;
+                }
 
-            // podwójnie razy znak czytany
-            if (m_state_numSign)
-                throw Exception("Tokenizer: Multiple number signs are not allowed");
+                // podwójnie razy znak czytany
+                if (m_state_numSign)
+                    throw Exception("Tokenizer: Multiple number signs are not allowed");
 
-            // przesuwamy wskaźnik na liczbe jeśli czytamy precyzje
-            if (m_state_optOperator) {
-                m_it2 = m_it;
-            // jeśli natomiast mamy nie dodany jeszcze do tokenów operator, to robimy to
-            } else if (m_state_operator) {
-                terminalRead(list);
-                m_state_operator = 0;
-            }
+                // przesuwamy wskaźnik na liczbe jeśli czytamy precyzje
+                if (m_state_optOperator) {
+                    m_it2 = m_it;
+                // jeśli natomiast mamy nie dodany jeszcze do tokenów operator, to robimy to
+                } else if (m_state_operator) {
+                    terminalRead(list);
+                    m_state_operator = 0;
+                }
 
-            m_state_numSign = true;
+                m_state_numSign = true;
 
-            // znak nie ma prawa być po przecinkach i kropkach
-            if (m_state_dots || m_state_numDecimals)
-                throw Exception("Tokenizer: Decimal seperators before sign was read");
-        // biały znak lub nawias
-        } else if (isWhitespace()) {
-            terminalRead(list);
-            resetState();
-            m_it2 = m_it + 1;
-        } else if (isBracket()) {
-            terminalRead(list);
-            resetState();
-            appendBracket(*m_it, list);
-            m_it2 = m_it + 1;
-        } else if (isOptionalOperator()) {
-            if (m_state_optOperator)
-                throw Exception("Tokenizer: Multiple precision operators found for single normal operator");
-
-            // koniec liczby odkryty, kończymy token i pętla od tego samego miejsca
-            if (m_state_numDigitRead) {
-                terminalRead(list);
-                resetState();
-                continue;
-            }
-
-            if (!m_state_operator) {
-                // operator precyzji można również użyć jako zwykły operator
-                // kończymy konstrukcje operatora już tutaj jako ,że nie chcemy czegoś takiego 5 ::10 5 bo to sensu nie ma
-                m_state_operator = *m_it;
+                // znak nie ma prawa być po przecinkach i kropkach
+                if (m_state_dots || m_state_numDecimals)
+                    throw Exception("Tokenizer: Decimal seperators before sign was read");
+            // biały znak lub nawias
+            } else if (isWhitespace()) {
                 terminalRead(list);
                 resetState();
                 m_it2 = m_it + 1;
-            } else {
-                m_state_optOperator = *m_it;
-            }
-        } else if (isOperator()) {
-            // koniec liczby odkryty, kończymy token i pętla od tego samego miejsca
-            if (m_state_numDigitRead) {
+            } else if (isBracket()) {
                 terminalRead(list);
                 resetState();
-                continue;
-            }
+                appendBracket(*m_it, list);
+                m_it2 = m_it + 1;
+            } else if (isOptionalOperator()) {
+                if (m_state_optOperator)
+                    throw Exception("Tokenizer: Multiple precision operators found for single normal operator");
 
-            m_state_operator = *m_it;
-        } else if (isDigit()) {
-            if (m_state_operator) {
-                if (!m_state_optOperator) {
-                    // koniec zwykłego operatora
+                // koniec liczby odkryty, kończymy token i pętla od tego samego miejsca
+                if (m_state_numDigitRead) {
                     terminalRead(list);
                     resetState();
-                    m_it2 = m_it;
-                } else if (!m_state_numDigitRead && !m_state_numSign) {
-                    // tworzymy operator z precyzją więc przesuwamy pointer na liczbe żeby nie odczytać znaków operatorów
-                    m_it2 = m_it;
+                    continue;
                 }
-            }
 
-            m_state_numDigitRead = true;
-            m_state_numSign = true;
+                if (!m_state_operator) {
+                    // operator precyzji można również użyć jako zwykły operator
+                    // kończymy konstrukcje operatora już tutaj jako ,że nie chcemy czegoś takiego 5 ::10 5 bo to sensu nie ma
+                    m_state_operator = *m_it;
+                    terminalRead(list);
+                    resetState();
+                    m_it2 = m_it + 1;
+                } else {
+                    m_state_optOperator = *m_it;
+                }
+            } else if (isOperator()) {
+                // koniec liczby odkryty, kończymy token i pętla od tego samego miejsca
+                if (m_state_numDigitRead) {
+                    terminalRead(list);
+                    resetState();
+                    continue;
+                }
 
-            // resetujemy kropki ,żeby gdzieś nie wkradł się operator range'a
-            m_state_dots = 0;
-        } else if (isDot() && m_state_dots == 1) {
-            ++m_state_dots; // żeby nie wykryło jako osierocone kropki
-            terminalRead(list);
-            resetState();
-            appendRangeOperator(list);
-            m_it2 = m_it + 1;
-        } else if (isDecimalSeperator()) {
-            // koniec liczby odkryty, kończymy token i pętla od tego samego miejsca
-            // żeby 5.12.. rozpoznało jako liczbe 5.12 pomimo znaków seperatora na końcu
-            if (m_state_numDecimals >= 1 && m_state_numDigitRead) {
+                m_state_operator = *m_it;
+            } else if (isDigit()) {
+                if (m_state_operator) {
+                    if (!m_state_optOperator) {
+                        // koniec zwykłego operatora
+                        terminalRead(list);
+                        resetState();
+                        m_it2 = m_it;
+                    } else if (!m_state_numDigitRead && !m_state_numSign) {
+                        // tworzymy operator z precyzją więc przesuwamy pointer na liczbe żeby nie odczytać znaków operatorów
+                        m_it2 = m_it;
+                    }
+                }
+
+                m_state_numDigitRead = true;
+                m_state_numSign = true;
+
+                // resetujemy kropki ,żeby gdzieś nie wkradł się operator range'a
+                m_state_dots = 0;
+            } else if (isDot() && m_state_dots == 1) {
+                ++m_state_dots; // żeby nie wykryło jako osierocone kropki
                 terminalRead(list);
                 resetState();
-                continue;
+                appendRangeOperator(list);
+                m_it2 = m_it + 1;
+            } else if (isDecimalSeperator()) {
+                // koniec liczby odkryty, kończymy token i pętla od tego samego miejsca
+                // żeby 5.12.. rozpoznało jako liczbe 5.12 pomimo znaków seperatora na końcu
+                if (m_state_numDecimals >= 1 && m_state_numDigitRead) {
+                    terminalRead(list);
+                    resetState();
+                    continue;
+                }
+
+                if (isDot())
+                    ++m_state_dots;
+
+                m_state_numDecimals++;
+            } else {
+                throw Exception("Tokenizer: Unknown character");
             }
 
-            if (isDot())
-                ++m_state_dots;
-
-            m_state_numDecimals++;
-        } else {
-            throw Exception("Tokenizer: Unknown character");
+            m_it++;
+        }
+    } catch (...) {
+        for (auto *x: list) {
+            delete x;
         }
 
-        m_it++;
+        throw;
     }
 
     // end of file tak jakby

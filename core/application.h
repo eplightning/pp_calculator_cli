@@ -15,13 +15,11 @@ namespace Calculator {
         int execute();
 
     private:
-        Number calculate(const std::string &input, int precision = 10);
+        Number calculate(const std::string &input, int precision = 10) const;
 
         std::map<char, int> m_precedence;
         bool m_verbose;
     };
-
-
 
 }
 

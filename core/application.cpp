@@ -19,15 +19,57 @@ Application::Application(bool verbose) :
 {
 }
 
-Number Application::calculate(const std::string &input, int precision)
+Number Application::calculate(const std::string &input, int precision) const
 {
     // tokenizujemy
     Tokenizer tok(input);
     std::vector<Token*> tokens = tok.tokenize();
 
-    // sprawdzamy sens
-    SyntaxChecker checker(tokens);
-    checker.check();
+    Expression *expr = 0;
+
+    try {
+        // sprawdzamy sens
+        SyntaxChecker checker(tokens);
+        checker.check();
+
+        // parser
+        Parser parser(tokens, m_precedence);
+        expr = parser.parse();
+    } catch (...) {
+        // usuwanie tokenów
+        for (Token *tok : tokens) {
+            delete tok;
+        }
+
+        throw;
+    }
+
+    // rekurencyjnie liczymy rozwiązanie
+    Number out;
+
+    try {
+        out = expr->evaluate(0, precision);
+    } catch (...) {
+        // usuwanie wyrażeń
+        delete expr;
+
+        // usuwanie tokenów
+        for (Token *tok : tokens) {
+            delete tok;
+        }
+
+        throw;
+    }
+
+    // usuwanie wyrażeń
+    delete expr;
+
+    // usuwanie tokenów
+    for (Token *tok : tokens) {
+        delete tok;
+    }
+
+    return out;
 
     /*for (Token *x : tokens) {
         switch (x->type()) {
@@ -51,22 +93,6 @@ Number Application::calculate(const std::string &input, int precision)
 
         std::cout << std::endl;
     }*/
-
-    // parser
-    Parser parser(tokens, m_precedence, precision);
-    Expression *expr = parser.parse();
-
-    Number out = expr->evaluate(0, precision);
-
-    // usuwanie wyrażeń
-    delete expr;
-
-    // usuwanie tokenów
-    for (Token *tok : tokens) {
-        delete tok;
-    }
-
-    return out;
 }
 
 int Application::execute()

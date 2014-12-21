@@ -12,18 +12,17 @@ namespace Calculator {
 
     class Parser {
     public:
-        Parser(const std::vector<Token *> &tokens, std::map<char, int> &precedence, int defaultPrecision);
+        Parser(const std::vector<Token *> &tokens, const std::map<char, int> &precedence);
 
         Expression *parse();
 
     private:
         void cleanupStack(std::stack<Expression*> &output, std::stack<OperatorToken*> &operators) const;
-        Expression *subParse(int accuracy, int precision, char endingBracket);
+        Expression *subParse(char endingBracket);
 
-        const std::vector<Token*> m_tokens;
-        std::map<char, int> &m_precedence;
+        const std::vector<Token*> &m_tokens;
+        const std::map<char, int> &m_precedence;
         std::vector<Token*>::const_iterator m_it;
-        int m_defaultPrecision;
     };
 
 }
