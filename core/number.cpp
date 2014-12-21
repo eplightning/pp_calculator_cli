@@ -569,8 +569,10 @@ void Number::multiply(const Number &right)
     // przecinek
     out.m_decimals = m_decimals + right.m_decimals;
 
-    if (out.m_digits.size() < static_cast<size_t>(out.m_decimals))
-        throw Exception("Multiplication: m_decimals > number size");
+    if (out.m_digits.size() < static_cast<size_t>(out.m_decimals)) {
+        for (int i = out.m_decimals - out.m_digits.size() + 1; i > 0; i--)
+            out.m_digits.push_back(0);
+    }
 
     // kopiujemy wynik
     out.m_accuracy = m_accuracy;
