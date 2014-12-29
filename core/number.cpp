@@ -302,7 +302,7 @@ void Number::add(const Number &right, bool ignoreSign)
         } else if (m_negative && !right.m_negative) {
             m_negative = false;
             subtract(right, true);
-            m_negative = !m_negative;
+            m_negative = isNull() ? false : !m_negative;
             return;
         }
     }
@@ -400,7 +400,7 @@ void Number::subtract(const Number &right, bool ignoreSign)
         } else if (m_negative && !right.m_negative) {
             m_negative = false;
             add(right, true);
-            m_negative = !m_negative;
+            m_negative = isNull() ? false : !m_negative;
             return;
         }
     }
