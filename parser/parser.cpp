@@ -34,7 +34,7 @@ Expression *Parser::subParse(char endingBracket)
                 BracketToken *br = static_cast<BracketToken*>(*m_it);
 
                 if (br->bracket() == '[') {
-                    if (!operators.empty() && *(m_precedence.find('[')) > *(m_precedence.find(operators.top()->op()))) {
+                    if (!operators.empty() && (m_precedence.find('['))->second > (m_precedence.find(operators.top()->op()))->second) {
                         cleanupStack(output, operators);
                     }
 
@@ -67,7 +67,7 @@ Expression *Parser::subParse(char endingBracket)
             } else {
                 OperatorToken *opt = static_cast<OperatorToken*>(*m_it);
 
-                if (!operators.empty() && *(m_precedence.find(opt->op())) > *(m_precedence.find(operators.top()->op()))) {
+                if (!operators.empty() && (m_precedence.find(opt->op()))->second > (m_precedence.find(operators.top()->op()))->second) {
                     cleanupStack(output, operators);
                 }
 
