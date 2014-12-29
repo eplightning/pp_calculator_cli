@@ -126,12 +126,14 @@ int Application::execute()
             if (m_verbose)
                 std::cout << "= ";
 
-            std::cout << out << std::endl;
+            std::cout << out;
         } catch (const std::exception &e) {
             std::cerr << e.what() << std::endl;
         } catch(...) {
             std::cerr << "Unknown exception" << std::endl;
         }
+
+        std::cout << std::endl;
     }
 
     return 0;
