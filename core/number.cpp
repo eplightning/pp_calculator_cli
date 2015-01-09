@@ -452,9 +452,9 @@ void Number::subtract(const Number &right, bool ignoreSign)
 
         li = bignum->m_digits.begin();
 
-        bignum->m_decimals += smallnum->m_decimals - bignum->m_decimals;
         ninePadding = smallnum->m_decimals - bignum->m_decimals - 1;
         tenPadding = 1;
+        bignum->m_decimals += smallnum->m_decimals - bignum->m_decimals;
     }
 
     for (; ri != smallnum->m_digits.cend(); ri++, li++) {
