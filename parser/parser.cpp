@@ -131,6 +131,10 @@ void Parser::cleanupStack(std::stack<Expression*> &output, std::stack<OperatorTo
                 output.push(new DivisionExpression(left, right, op->accuracy(), op->precision()));
                 break;
 
+            case '~':
+                output.push(new SquareExpression(left, right, op->accuracy(), op->precision()));
+                break;
+
             case ':':
                 output.push(new PrecisionExpression(left, right, op->accuracy(), op->precision()));
                 break;

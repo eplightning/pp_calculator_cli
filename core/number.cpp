@@ -361,8 +361,33 @@ void Number::add(const Number &right, bool ignoreSign)
     }
 
     // jeśli nadal mamy carry bit to dodajemy 1
-    if (carry)
-        m_digits.push_back(1);
+    if (carry) {
+        if (!endOfLeft) {
+            while (lit != m_digits.end()) {
+                char value = *lit;
+
+                if (carry) {
+                    carry = false;
+                    value += 1;
+                }
+
+                // jeśli >= 10 to ustawiamy bit przeniesienia
+                if (value >= 10) {
+                    carry = true;
+                    value -= 10;
+
+                    if (value >= 10)
+                        throw Exception("Unexpected error: Digit greater than 9");
+                }
+
+                *lit = value;
+                lit++;
+            }
+        }
+
+        if (carry)
+            m_digits.push_back(1);
+    }
 
     // dodajemy brakujące liczby po przecinku
     if (right.m_decimals > m_decimals) {
@@ -615,8 +640,21 @@ Number Number::inverse() const
     // dzieląca liczba
     Number integer = *this;
 
+    int shiftBy = m_decimals;
+
     if (m_decimals > 0) {
-        integer.shift(m_decimals);
+        if (m_digits.size() >= static_cast<size_t>(m_precision)) {
+            int cut = (m_digits.size() - m_precision);
+
+            if (cut <= m_decimals) {
+                integer.m_digits.erase(integer.m_digits.begin(), integer.m_digits.begin() + cut);
+
+                integer.m_decimals -= cut;
+                shiftBy -= cut;
+            }
+        }
+
+        integer.shift(shiftBy);
     }
 
     // szukanie odwrotności 0.(dowolna ilość zer)1, lub jedynki
@@ -639,7 +677,7 @@ Number Number::inverse() const
 
         if (cmp <= 0) {
             ++digit;
-            tmp -= integer;
+            tmp.subtract(integer, true);
         } else {
             numbers.push_front(digit);
             result.m_decimals++;
@@ -658,7 +696,7 @@ Number Number::inverse() const
     result.m_digits.push_back(0);
 
     // 1 / 0,321 = 1000 * (1 / 321)
-    result.shift(m_decimals);
+    result.shift(shiftBy);
 
     // dokładność
     if (m_accuracy > 0) {
@@ -674,6 +712,70 @@ Number Number::inverse() const
     result.normalize();
 
     return result;
+}
+
+Number Number::squareEstimation(Number iterations) const
+{
+    if (m_negative)
+        throw Exception("Imaginary numbers not supported");
+
+    int it = iterations.asInteger(true);
+
+    if (it < 1) {
+        it = 1;
+    } else if (it > 512) {
+        it = 512;
+    }
+
+    Number out = squareSeed();
+
+    if (out.isNull())
+        return out;
+
+    for (int i = 0; i < it; i++) {
+        out = (out + (*this / out));
+        out /= 2;
+    }
+
+    return out;
+}
+
+Number Number::squareSeed() const
+{
+    if (isNull()) {
+        Number out(0);
+
+        return out;
+    }
+
+    int shift = 0;
+    int digit = 2;
+
+    // liczby od 0,00000000... do 0,999...
+    if (m_digits.back() == 0) {
+        for (auto digit = m_digits.crbegin(); digit != m_digits.crend(); digit++, shift--) {
+            if (*digit != 0)
+                break;
+        }
+    } else {
+        shift = m_digits.size() - m_decimals - 1;
+    }
+
+    if (shift % 2) {
+        shift--;
+        digit = 6;
+    }
+
+    shift /= 2;
+
+    Number out(digit);
+
+    out.setAccuracy(m_accuracy);
+    out.setPrecision(m_precision);
+
+    out.shift(shift);
+
+    return out;
 }
 
 int Number::compareWith(const Number &other, bool ignoreSign) const

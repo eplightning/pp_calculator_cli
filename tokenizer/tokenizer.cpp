@@ -235,7 +235,7 @@ bool Tokenizer::isDigit() const
 
 bool Tokenizer::isOperator() const
 {
-    return *m_it == '+' || *m_it == '-' || *m_it == '*' || *m_it == '/';
+    return *m_it == '+' || *m_it == '-' || *m_it == '*' || *m_it == '/' || *m_it == '~';
 }
 
 bool Tokenizer::isOptionalOperator() const

@@ -28,6 +28,9 @@ namespace Calculator {
         // liczba odwrotna
         Number inverse() const;
 
+        // pierwiastek (przybliżenie)
+        Number squareEstimation(Number iterations) const;
+
         // zwraca (a przynajmniej stara się zwrócić) część całkowitą lub po przecinku jako int
         unsigned long long asInteger(bool integers = true) const;
 
@@ -61,6 +64,9 @@ namespace Calculator {
         void add(const Number &right, bool ignoreSign = false);
         void subtract(const Number &right, bool ignoreSign = false);
         void multiply(const Number &right);
+
+        // pierwsze przybliżenie pierwiastka
+        Number squareSeed() const;
 
         // porównywarka liczb
         int compareWith(const Number &other, bool ignoreSign = false) const;

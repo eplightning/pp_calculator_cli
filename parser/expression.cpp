@@ -199,6 +199,29 @@ Number DivisionExpression::evaluate(int accuracy, int precision)
 }
 
 //
+// Expression ~
+//
+
+SquareExpression::SquareExpression(Expression *left, Expression *right, int accuracy, int precision) :
+    OperatorExpression(left, right, accuracy, precision)
+{
+
+}
+
+Number SquareExpression::evaluate(int accuracy, int precision)
+{
+    if (m_accuracy > -1)
+        accuracy = m_accuracy;
+
+    if (m_precision > 0)
+        precision = m_precision;
+
+    Number out = m_left->evaluate(accuracy, precision);
+
+    return out.squareEstimation(m_right->evaluate(accuracy, precision));
+}
+
+//
 // Expression :
 //
 

@@ -84,6 +84,13 @@ namespace Calculator {
         Number evaluate(int accuracy = 0, int precision = 10);
     };
 
+    class SquareExpression : public OperatorExpression {
+    public:
+        SquareExpression(Expression *left, Expression *right, int accuracy = -1, int precision = -1);
+
+        Number evaluate(int accuracy = 0, int precision = 10);
+    };
+
     class PrecisionExpression : public OperatorExpression {
     public:
         PrecisionExpression(Expression *left, Expression *right, int accuracy = -1, int precision = -1);

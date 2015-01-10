@@ -98,13 +98,14 @@ Number Application::calculate(const std::string &input, int precision) const
 int Application::execute()
 {
     // pierwszeństwo operatorów
-    m_precedence['.'] = 4;
-    m_precedence['+'] = 3;
-    m_precedence['-'] = 3;
-    m_precedence[':'] = 2;
-    m_precedence['/'] = 1;
-    m_precedence['*'] = 1;
-    m_precedence['['] = 0;
+    m_precedence['.'] = 5;
+    m_precedence['+'] = 4;
+    m_precedence['-'] = 4;
+    m_precedence[':'] = 3;
+    m_precedence['/'] = 2;
+    m_precedence['*'] = 2;
+    m_precedence['['] = 1;
+    m_precedence['~'] = 0;
 
     std::string input;
 
