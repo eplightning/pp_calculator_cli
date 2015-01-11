@@ -112,11 +112,13 @@ int Application::execute()
     if (m_verbose)
         std::cout << "Kalkulator, podaj wyrazenie do obliczenia lub exit, aby wyjsc" << std::endl;
 
-    while (true) {
+    while (!std::cin.fail() && !std::cin.eof()) {
         if (m_verbose)
             std::cout << "> ";
 
-        std::getline(std::cin, input);
+        do {
+            std::getline(std::cin, input);
+        } while(input.empty());
 
         if (input == "exit")
             break;
