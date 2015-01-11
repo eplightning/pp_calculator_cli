@@ -22,10 +22,10 @@ void SyntaxChecker::check()
         // sprawdzanie nawiasów
         if ((*it)->type() == TokenType::bracketEnd) {
             if (m_brackets.empty())
-                throw Exception("Syntax checker: Bracket end for not existent bracket open");
+                throw Exception("Syntax checker: Bracket end for not existent bracket open", (*it)->position());
 
             if (!m_brackets.back()->matching(*static_cast<BracketToken*>(*it)))
-                throw Exception("Syntax checker: Mismatching bracket end");
+                throw Exception("Syntax checker: Mismatching bracket end", (*it)->position());
 
             m_brackets.pop_back();
         } else if ((*it)->type() == TokenType::bracketOpen) {
@@ -35,7 +35,7 @@ void SyntaxChecker::check()
         // operator zasięgu
         if ((*it)->type() == TokenType::op && static_cast<OperatorToken*>(*it)->op() == '.'
             && !insideBracket('[')) {
-            throw Exception("Syntax checker: Range operator not inside index operator");
+            throw Exception("Syntax checker: Range operator not inside index operator", (*it)->position());
         }
 
         // sprawdzanie wyr. op wyr.
@@ -44,10 +44,10 @@ void SyntaxChecker::check()
 
             if ((*it)->type() == TokenType::num && (prevToken->type() == TokenType::bracketEnd
                                                    || prevToken->type() == TokenType::num)) {
-                throw Exception("Syntax checker: Number after bracket end or another number");
+                throw Exception("Syntax checker: Number after bracket end or another number", (*it)->position());
             } else if ((*it)->type() == TokenType::op && (prevToken->type() == TokenType::bracketOpen
                                                           || prevToken->type() == TokenType::op)) {
-                throw Exception("Syntax checker: Operator after bracket open or another operator");
+                throw Exception("Syntax checker: Operator after bracket open or another operator", (*it)->position());
             }
         }
     }

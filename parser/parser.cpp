@@ -45,7 +45,7 @@ Expression *Parser::subParse(char endingBracket)
                     m_it++;
                     output.push(subParse(')'));
                 } else {
-                    throw Exception("Parser: Invalid bracket");
+                    throw Exception("Parser: Invalid bracket", (*m_it)->position());
                 }
 
                 continue;
@@ -53,12 +53,12 @@ Expression *Parser::subParse(char endingBracket)
                 BracketToken *bracket = static_cast<BracketToken*>(*m_it);
 
                 if (!endingBracket) {
-                    throw Exception("Parser: Unexpected bracket end");
+                    throw Exception("Parser: Unexpected bracket end", (*m_it)->position());
                 } else if (bracket->bracket() == endingBracket) {
                     m_it++;
                     break;
                 } else {
-                    throw Exception("Parser: Invalid ending of a bracket found");
+                    throw Exception("Parser: Invalid ending of a bracket found", (*m_it)->position());
                 }
             } else if (type == TokenType::num) {
                 NumberToken *number = static_cast<NumberToken*>(*m_it);

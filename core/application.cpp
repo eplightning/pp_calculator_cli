@@ -70,29 +70,6 @@ Number Application::calculate(const std::string &input, int precision) const
     }
 
     return out;
-
-    /*for (Token *x : tokens) {
-        switch (x->type()) {
-            case TokenType::bracketEnd:
-                std::cout << "BracketEnd " << ((BracketToken*) x)->bracket();
-                break;
-
-            case TokenType::bracketOpen:
-                std::cout << "BracketOpen " << ((BracketToken*) x)->bracket();
-                break;
-
-            case TokenType::num:
-                std::cout << "Num " << (((NumberToken*) x)->num());
-                break;
-
-            case TokenType::op:
-                OperatorToken *y = (OperatorToken*) x;
-                std::cout << "Op " << y->op() << " (" << y->precision() << " " << y->accuracy() << ")";
-                break;
-        }
-
-        std::cout << std::endl;
-    }*/
 }
 
 int Application::execute()

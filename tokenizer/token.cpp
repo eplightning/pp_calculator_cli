@@ -20,8 +20,8 @@ Token::~Token()
 // Bracket Token
 //
 
-BracketToken::BracketToken(char bracket)
-    : OperatorToken(bracket), m_bracket(bracket)
+BracketToken::BracketToken(char bracket, int position)
+    : OperatorToken(bracket, position), m_bracket(bracket)
 {
 
 }
@@ -63,8 +63,8 @@ TokenType BracketToken::type() const
 // Operator Token
 //
 
-OperatorToken::OperatorToken(char op)
-    : m_op(op)
+OperatorToken::OperatorToken(char op, int position)
+    : m_op(op), m_position(position)
 {
 
 }
@@ -89,12 +89,17 @@ TokenType OperatorToken::type() const
     return TokenType::op;
 }
 
+int OperatorToken::position() const
+{
+    return m_position;
+}
+
 //
 // Operator Token (with precision/accuracy)
 //
 
-OperatorPrecisionToken::OperatorPrecisionToken(char op, const Number &precision)
-    : OperatorToken(op)
+OperatorPrecisionToken::OperatorPrecisionToken(char op, const Number &precision, int position)
+    : OperatorToken(op, position)
 {
     m_precision = precision.asInteger(false);
     m_accuracy  = precision.asInteger(true);
@@ -117,8 +122,8 @@ int OperatorPrecisionToken::precision() const
 // Number Token
 //
 
-NumberToken::NumberToken(const std::string &num)
-    : m_num(num)
+NumberToken::NumberToken(const std::string &num, int position)
+    : m_num(num), m_position(position)
 {
 
 }
@@ -131,4 +136,9 @@ const Number &NumberToken::num() const
 TokenType NumberToken::type() const
 {
     return TokenType::num;
+}
+
+int NumberToken::position() const
+{
+    return m_position;
 }

@@ -10,6 +10,7 @@ namespace Calculator {
     public:
         explicit Exception();
         explicit Exception(std::string message);
+        explicit Exception(const std::string &message, int chr);
         virtual ~Exception() throw() { }
 
         virtual const char *what() const throw();

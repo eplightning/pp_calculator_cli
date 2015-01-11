@@ -36,7 +36,7 @@ std::vector<Token*> Tokenizer::tokenize()
 
                 // podwójnie razy znak czytany
                 if (m_state_numSign)
-                    throw Exception("Tokenizer: Multiple number signs are not allowed");
+                    throw Exception("Tokenizer: Multiple number signs are not allowed", std::distance(m_input.cbegin(), m_it));
 
                 // przesuwamy wskaźnik na liczbe jeśli czytamy precyzje
                 if (m_state_optOperator) {
@@ -51,7 +51,7 @@ std::vector<Token*> Tokenizer::tokenize()
 
                 // znak nie ma prawa być po przecinkach i kropkach
                 if (m_state_dots || m_state_numDecimals)
-                    throw Exception("Tokenizer: Decimal seperators before sign was read");
+                    throw Exception("Tokenizer: Decimal seperators before sign was read", std::distance(m_input.cbegin(), m_it));
             // biały znak lub nawias
             } else if (isWhitespace()) {
                 terminalRead(list);
@@ -64,7 +64,7 @@ std::vector<Token*> Tokenizer::tokenize()
                 m_it2 = m_it + 1;
             } else if (isOptionalOperator()) {
                 if (m_state_optOperator)
-                    throw Exception("Tokenizer: Multiple precision operators found for single normal operator");
+                    throw Exception("Tokenizer: Multiple precision operators found for single normal operator", std::distance(m_input.cbegin(), m_it));
 
                 // koniec liczby odkryty, kończymy token i pętla od tego samego miejsca
                 if (m_state_numDigitRead) {
@@ -130,7 +130,7 @@ std::vector<Token*> Tokenizer::tokenize()
 
                 m_state_numDecimals++;
             } else {
-                throw Exception("Tokenizer: Unknown character");
+                throw Exception("Tokenizer: Unknown character", std::distance(m_input.cbegin(), m_it));
             }
 
             m_it++;
@@ -169,9 +169,9 @@ void Tokenizer::terminalRead(std::vector<Token*> &list)
 
     // dziwne stany
     if (m_state_numSign && !m_state_numDigitRead) {
-        throw Exception("Tokenizer: Sign without following numbers");
+        throw Exception("Tokenizer: Sign without following numbers", std::distance(m_input.cbegin(), m_it));
     } else if (m_state_numDecimals > 1) {
-        throw Exception("Tokenizer: More than two decimal seperators detected");
+        throw Exception("Tokenizer: More than two decimal seperators detected", std::distance(m_input.cbegin(), m_it));
     }
 
     Token *tok = 0;
@@ -180,36 +180,36 @@ void Tokenizer::terminalRead(std::vector<Token*> &list)
     if (m_state_operator) {
         if (m_state_optOperator) {
             if (!m_state_numDigitRead) {
-                throw Exception("Tokenizer: Operator with precision without number");
+                throw Exception("Tokenizer: Operator with precision without number", std::distance(m_input.cbegin(), m_it));
             }
 
-            tok = new OperatorPrecisionToken(m_state_operator, std::string(m_it2, m_it));
+            tok = new OperatorPrecisionToken(m_state_operator, std::string(m_it2, m_it), std::distance(m_input.cbegin(), m_it));
             list.push_back(tok);
         } else {
-            tok = new OperatorToken(m_state_operator);
+            tok = new OperatorToken(m_state_operator, std::distance(m_input.cbegin(), m_it));
             list.push_back(tok);
         }
     } else if (m_state_numDigitRead) {
-        tok = new NumberToken(std::string(m_it2, m_it));
+        tok = new NumberToken(std::string(m_it2, m_it), std::distance(m_input.cbegin(), m_it));
         list.push_back(tok);
     }
 
     if (tok) {
         m_last = tok;
     } else if (m_state_dots == 1 || (m_state_dots == 0 && m_state_numDecimals > 0)) {
-        throw Exception("Tokenizer: Orphaned dot or comma (probably at the end)");
+        throw Exception("Tokenizer: Orphaned dot or comma (probably at the end)", std::distance(m_input.cbegin(), m_it));
     }
 }
 
 void Tokenizer::appendBracket(char bracket, std::vector<Token *> &list)
 {
-    m_last = new BracketToken(bracket);
+    m_last = new BracketToken(bracket, std::distance(m_input.cbegin(), m_it));
     list.push_back(m_last);
 }
 
 void Tokenizer::appendRangeOperator(std::vector<Token *> &list)
 {
-    m_last = new OperatorToken('.');
+    m_last = new OperatorToken('.', std::distance(m_input.cbegin(), m_it));
     list.push_back(m_last);
 }
 
